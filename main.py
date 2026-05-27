@@ -1,5 +1,16 @@
 #20260527
 
+import os
+import json
+from google.oauth2 import service_account
+
+# 讀取 GitHub Secrets 的金鑰內容
+creds_dict = json.loads(os.environ['GOOGLE_CREDENTIALS'])
+creds = service_account.Credentials.from_service_account_info(creds_dict, 
+        scopes=["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"])
+
+# 接下來使用這個 creds 進行 gspread 或 Drive API 的初始化
+
 import google.generativeai as genai
 import json
 import os
