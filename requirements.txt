@@ -1,0 +1,5 @@
+google-genai
+gspread
+pillow
+google-auth
+google-api-python-client
