@@ -22,7 +22,7 @@ gc = gspread.authorize(creds)
 # 正確初始化新版 Gemini Client
 client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
 
-FOLDER_ID = '1aUSfbCKTw6IrJz3Pe2S2wt9RZ_gMYwTh'
+FOLDER_ID = '149F1PWx5ntPLZyoZrampX9KunWsX6viw'
 PROCESSED_FOLDER_ID = '1OdiZW_biWTaXzIB6RD9MFM5BaWthryIx'
 
 def analyze_prescription_image(image_path):
