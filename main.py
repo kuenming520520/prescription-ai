@@ -55,41 +55,39 @@ def save_to_sheet(data_dict):
 
 # 2. 自動化主邏輯
 print("正在掃描 Google Drive...")
-            results = drive_service.files().list(
-                q=f"'{FOLDER_ID}' in parents and trashed = false", 
-                fields="files(id, name)",
-                pageSize=1  # 強制限制只拿取 1 個檔案
-            ).execute()
-            files = results.get('files', [])
+results = drive_service.files().list(
+    q=f"'{FOLDER_ID}' in parents and trashed = false", 
+    fields="files(id, name)",
+    pageSize=1  # 強制限制只拿取 1 個檔案
+).execute()
+files = results.get('files', [])
             
-            if not files:
-                print("沒有需要處理的圖片。")
-            else:
-                file = files[0] # 只拿第一張
-                print(f"本次任務只處理: {file['name']}")
-            
-            # 下載檔案
-            request = drive_service.files().get_media(fileId=file['id'])
-            with open(file['name'], 'wb') as f:
-                f.write(request.execute())
-            
-            # 分析與儲存
-            try:
-                raw_text = analyze_prescription_image(file['name'])
-                data = json.loads(raw_text)
-                save_to_sheet(data)
-                
-                # 移動檔案
-                drive_service.files().update(
-                    fileId=file['id'], 
-                    addParents=PROCESSED_FOLDER_ID, 
-                    removeParents=FOLDER_ID,
-                    fields='id, parents'
-                ).execute()
-                
-                print(f"✅ 完成: {file['name']}")
-            except Exception as e:
-                print(f"❌ 處理失敗: {file['name']}, 錯誤: {e}")
-            finally:
-                if os.path.exists(file['name']):
-                    os.remove(file['name'])
+if not files:
+    print("沒有需要處理的圖片。")
+else:
+    file = files[0] # 只拿第一張
+    print(f"本次任務只處理: {file['name']}")
+try:
+        # 下載檔案
+        request = drive_service.files().get_media(fileId=file['id'])
+        with open(file['name'], 'wb') as f:
+            f.write(request.execute())
+        
+        # 分析與儲存
+        raw_text = analyze_prescription_image(file['name'])
+        save_to_sheet(json.loads(raw_text))
+        
+        # 移動檔案到已處理資料夾
+        drive_service.files().update(
+            fileId=file['id'], 
+            addParents=PROCESSED_FOLDER_ID, 
+            removeParents=FOLDER_ID,
+            fields='id, parents'
+        ).execute()
+        
+        print(f"✅ 成功完成: {file['name']}")
+    except Exception as e:
+        print(f"❌ 處理失敗: {file['name']}, 錯誤訊息: {e}")
+    finally:
+        if os.path.exists(file['name']):
+            os.remove(file['name'])
