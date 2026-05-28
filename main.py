@@ -3,7 +3,7 @@ import json
 import time
 import gspread
 from PIL import Image
-from google.genai import Client # 使用最新推薦套件
+import google.generativeai as genai # 使用最新推薦套件
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
