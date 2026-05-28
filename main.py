@@ -33,7 +33,6 @@ def analyze_prescription_image(image_path):
         contents=[image, "請擔任專業臨床藥師，嚴格輸出純 JSON 格式，不要包含 markdown 標記，分析病歷並生成練習題。"]
     )
     image.close()
-    # 清理回應內容
     return response.text.replace('```json', '').replace('```', '').strip()
 
 def save_to_sheet(data_dict):
@@ -58,16 +57,18 @@ print("正在掃描 Google Drive...")
 results = drive_service.files().list(
     q=f"'{FOLDER_ID}' in parents and trashed = false", 
     fields="files(id, name)",
-    pageSize=1  # 強制限制只拿取 1 個檔案
+    pageSize=1
 ).execute()
 files = results.get('files', [])
-            
+
 if not files:
     print("沒有需要處理的圖片。")
 else:
-    file = files[0] # 只拿第一張
+    file = files[0]
     print(f"本次任務只處理: {file['name']}")
-try:
+    
+    # 確保 try-except 在這裡縮排正確
+    try:
         # 下載檔案
         request = drive_service.files().get_media(fileId=file['id'])
         with open(file['name'], 'wb') as f:
