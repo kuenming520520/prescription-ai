@@ -55,18 +55,18 @@ def save_to_sheet(data_dict):
 
 # 2. 自動化主邏輯
 print("正在掃描 Google Drive...")
-results = drive_service.files().list(
-    q=f"'{FOLDER_ID}' in parents and trashed = false", 
-    fields="files(id, name)"
-).execute()
-files = results.get('files', [])
-
-if not files:
-    print("沒有發現新的圖片檔案。")
-else:
-    for file in files:
-        if file['name'].lower().endswith(('.jpg', '.png', '.jpeg')):
-            print(f"正在處理: {file['name']}")
+            results = drive_service.files().list(
+                q=f"'{FOLDER_ID}' in parents and trashed = false", 
+                fields="files(id, name)",
+                pageSize=1  # 強制限制只拿取 1 個檔案
+            ).execute()
+            files = results.get('files', [])
+            
+            if not files:
+                print("沒有需要處理的圖片。")
+            else:
+                file = files[0] # 只拿第一張
+                print(f"本次任務只處理: {file['name']}")
             
             # 下載檔案
             request = drive_service.files().get_media(fileId=file['id'])
